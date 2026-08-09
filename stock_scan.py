@@ -1,6 +1,7 @@
 import os
 import requests
 import pandas as pd
+import numpy as np
 import yfinance as yf
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -32,6 +33,18 @@ WATCHLIST = [
     "SMH"
     "0083.HK"
 ]
+def rsi(series, period=14):
+    delta = series.diff()
+
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+
+    avg_gain = gain.rolling(period).mean()
+    avg_loss = loss.rolling(period).mean()
+
+    rs = avg_gain / avg_loss
+
+    return 100 - (100 / (1 + rs))
 
 message_lines = []
 

@@ -56,12 +56,9 @@ for ticker in WATCHLIST:
             progress=False,
             auto_adjust=True
         )
-
         close = data["Close"]
-
 ma200 = close.rolling(200).mean().iloc[-1]
 price = close.iloc[-1]
-
 rsi14 = rsi(close).iloc[-1]
 
 if price > ma200:

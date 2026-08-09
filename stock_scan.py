@@ -167,23 +167,23 @@ for ticker, rsi_limit in WATCHLIST.items():
             and discount > 10
         ):
 
-strong_buy.append(
-    f"🚨 {ticker}\n\n"
-    f"Score: {score}/100\n"
-    f"Classification: {classification}\n"
-    f"Trend: {trend}\n\n"
-    f"Price: {price:.2f}\n"
-    f"RSI: {rsi14:.1f}\n"
-    f"50DMA: {status50}\n"
-    f"200DMA: {status200}\n"
-    f"Discount: {discount:.1f}%\n\n"
-    f"Technical Thesis:\n"
-    f"• Oversold (RSI below 35)\n"
-    f"• Long-term trend intact\n"
-    f"• Trading below recent highs\n"
-    f"• Potential accumulation opportunity"
-    f"{news_section}"
-)
+            strong_buy.append(
+                f"🚨 {ticker}\n\n"
+                f"Score: {score}/100\n"
+                f"Classification: {classification}\n"
+                f"Trend: {trend}\n\n"
+                f"Price: {price:.2f}\n"
+                f"RSI: {rsi14:.1f}\n"
+                f"50DMA: {status50}\n"
+                f"200DMA: {status200}\n"
+                f"Discount: {discount:.1f}%\n\n"
+                f"Technical Thesis:\n"
+                f"• Oversold (RSI below 35)\n"
+                f"• Long-term trend intact\n"
+                f"• Trading below recent highs\n"
+                f"• Potential accumulation opportunity"
+                f"{news_section}"
+            )
 
 
         # BUY

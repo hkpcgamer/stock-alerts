@@ -27,6 +27,10 @@ WATCHLIST = [
     "TSLA",
     "SCHD",
     "VIG"
+    "293.HK"
+    "SPCX"
+    "SMH"
+    "0083.HK"
 ]
 
 message_lines = []

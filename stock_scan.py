@@ -5,7 +5,7 @@ from datetime import datetime
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-FINNHUB_API_KEY = os.environ["FINNHUB_API_KEY"]
+FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
 
 WATCHLIST = {
     "1475.T": 40,
@@ -210,6 +210,19 @@ for ticker, rsi_limit in WATCHLIST.items():
             and rsi14 < 35
             and discount > 10
         ):
+
+            news_section = ""
+
+        if FINNHUB_API_KEY:
+
+            news_list = get_news(ticker)
+
+        if news_list:
+
+            news_section = "\n\n📰 Recent News\n"
+
+        for headline in news_list:
+            news_section += f"• {headline}\n"
 
             strong_buy.append(
                 f"🚨 {ticker}\n\n"

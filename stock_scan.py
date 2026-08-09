@@ -33,6 +33,8 @@ WATCHLIST = [
     "SMH",
     "0083.HK"
 ]
+
+
 def rsi(series, period=14):
     delta = series.diff()
 
@@ -46,23 +48,34 @@ def rsi(series, period=14):
 
     return 100 - (100 / (1 + rs))
 
+
 message_lines = []
 
 for ticker in WATCHLIST:
+
     try:
+
         data = yf.download(
             ticker,
             period="1y",
             progress=False,
             auto_adjust=True
         )
-         close = data["Close"]
+
+        if data.empty:
+            continue
+
+        close = data["Close"]
 
         ma200 = close.rolling(200).mean().iloc[-1]
         price = close.iloc[-1]
         rsi14 = rsi(close).iloc[-1]
 
+        if pd.isna(ma200) or pd.isna(rsi14):
+            continue
+
         if price > ma200:
+
             message_lines.append(
                 f"{ticker}\n"
                 f"Price: {price:.2f}\n"
@@ -70,9 +83,8 @@ for ticker in WATCHLIST:
                 f"Above 200DMA ✅\n"
             )
 
-
     except Exception as e:
-        print(e)
+        print(f"{ticker}: {e}")
 
 message = "\n".join(message_lines)
 

@@ -76,9 +76,18 @@ for ticker, rsi_limit in WATCHLIST.items():
         close = data["Close"].squeeze()
 
         price = float(close.iloc[-1])
-        ma200 = float(close.rolling(200).mean().iloc[-1])
 
-        rsi14 = float(rsi(close).iloc[-1])
+        ma50 = float(
+            close.rolling(50).mean().iloc[-1]
+        )
+
+        ma200 = float(
+            close.rolling(200).mean().iloc[-1]
+        )
+
+        rsi14 = float(
+            rsi(close).iloc[-1]
+        )
 
         high52 = float(close.max())
 
@@ -88,7 +97,15 @@ for ticker, rsi_limit in WATCHLIST.items():
             * 100
         )
 
+        above50 = price > ma50
         above200 = price > ma200
+
+        if above50 and above200:
+            trend_status = "Strong Uptrend ✅✅"
+        elif above200:
+            trend_status = "Long-term Uptrend ✅"
+        else:
+            trend_status = "Trend Weak ❌"
 
         # STRONG BUY
         if (
@@ -98,19 +115,33 @@ for ticker, rsi_limit in WATCHLIST.items():
         ):
 
             explanation = (
-                "Reason:\n"
-                "• Above 200DMA ✅\n"
-                "• RSI below 35 ✅\n"
-                "• More than 10% below 52-week high ✅\n\n"
-                "Interpretation:\n"
-                "Oversold stock in a long-term uptrend."
+                f"Indicators:\n"
+                f"• RSI: {rsi14:.1f}\n"
+                f"• 50DMA: {ma50:.2f}\n"
+                f"• 200DMA: {ma200:.2f}\n"
+                f"• Discount from High: {discount:.1f}%\n\n"
+                f"Interpretation:\n"
             )
 
+            if above50:
+                explanation += (
+                    "• Price above 50DMA ✅\n"
+                    "• Price above 200DMA ✅\n"
+                    "• Momentum and trend aligned ✅\n"
+                    "• Pullback creates opportunity ✅"
+                )
+            else:
+                explanation += (
+                    "• Price below 50DMA ⚠️\n"
+                    "• Price above 200DMA ✅\n"
+                    "• Long-term trend intact ✅\n"
+                    "• Recovery not yet confirmed"
+                )
+
             strong_buy.append(
-                f"🚨 {ticker}\n"
+                f"🚨 {ticker}\n\n"
                 f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n"
-                f"Discount: {discount:.1f}%\n\n"
+                f"Trend: {trend_status}\n\n"
                 f"{explanation}"
             )
 
@@ -124,19 +155,15 @@ for ticker, rsi_limit in WATCHLIST.items():
             and rsi14 < rsi_limit
         ):
 
-            explanation = (
-                "Reason:\n"
-                "• Above 200DMA ✅\n"
-                "• RSI below threshold ✅\n\n"
-                "Interpretation:\n"
-                "Healthy uptrend experiencing a pullback."
-            )
-
             buy.append(
-                f"✅ {ticker}\n"
+                f"✅ {ticker}\n\n"
                 f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n\n"
-                f"{explanation}"
+                f"RSI: {rsi14:.1f}\n"
+                f"50DMA: {ma50:.2f}\n"
+                f"200DMA: {ma200:.2f}\n"
+                f"Trend: {trend_status}\n\n"
+                f"Interpretation:\n"
+                f"Healthy uptrend experiencing a pullback."
             )
 
         # WATCH
@@ -145,27 +172,24 @@ for ticker, rsi_limit in WATCHLIST.items():
             and rsi14 < 40
         ):
 
-            explanation = (
-                "Reason:\n"
-                "• Oversold ✅\n"
-                "• Below 200DMA ❌\n\n"
-                "Interpretation:\n"
-                "Potential opportunity if trend improves."
-            )
-
             watch.append(
-                f"👀 {ticker}\n"
+                f"👀 {ticker}\n\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
-                f"Discount: {discount:.1f}%\n\n"
-                f"{explanation}"
+                f"50DMA: {ma50:.2f}\n"
+                f"200DMA: {ma200:.2f}\n"
+                f"Discount from High: {discount:.1f}%\n\n"
+                f"Interpretation:\n"
+                f"Oversold but still below the 200DMA. "
+                f"Wait for trend confirmation."
             )
 
             summary_watch.append(
                 f"{ticker} (RSI {rsi14:.1f})"
             )
 
-        # Weekly summary categorisation
+        # Weekly summary classification
+
         if rsi14 > 70:
             summary_extended.append(
                 f"{ticker} (RSI {rsi14:.1f})"
@@ -180,6 +204,7 @@ for ticker, rsi_limit in WATCHLIST.items():
         print(f"{ticker}: {e}")
 
 # Sunday Summary
+
 if today == 6:
 
     sections = ["📊 Weekly Watchlist Review"]
@@ -211,6 +236,7 @@ if today == 6:
     message = "\n\n".join(sections)
 
 # Weekday Scans
+
 else:
 
     sections = ["📈 Watchlist Scan"]

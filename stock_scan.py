@@ -52,7 +52,12 @@ today = datetime.utcnow().weekday()
 
 strong_buy = []
 buy = []
-summary = []
+watch = []
+
+summary_strong = []
+summary_watch = []
+summary_healthy = []
+summary_extended = []
 
 for ticker, rsi_limit in WATCHLIST.items():
 
@@ -72,70 +77,166 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         price = float(close.iloc[-1])
         ma200 = float(close.rolling(200).mean().iloc[-1])
+
         rsi14 = float(rsi(close).iloc[-1])
 
         high52 = float(close.max())
 
-        discount = ((high52 - price) / high52) * 100
-
-        trend = "✅" if price > ma200 else "❌"
-
-        summary.append(
-            f"{ticker} | RSI {rsi14:.1f} | {discount:.0f}% off high | {trend}"
+        discount = (
+            (high52 - price)
+            / high52
+            * 100
         )
 
+        above200 = price > ma200
+
+        # STRONG BUY
         if (
-            price > ma200
+            above200
             and rsi14 < 35
             and discount > 10
         ):
 
-            strong_buy.append(
-                f"{ticker}\n"
-                f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n"
-                f"Discount from High: {discount:.1f}%"
+            explanation = (
+                "Reason:\n"
+                "• Above 200DMA ✅\n"
+                "• RSI below 35 ✅\n"
+                "• More than 10% below 52-week high ✅\n\n"
+                "Interpretation:\n"
+                "Oversold stock in a long-term uptrend."
             )
 
+            strong_buy.append(
+                f"🚨 {ticker}\n"
+                f"Price: {price:.2f}\n"
+                f"RSI: {rsi14:.1f}\n"
+                f"Discount: {discount:.1f}%\n\n"
+                f"{explanation}"
+            )
+
+            summary_strong.append(
+                f"{ticker} (RSI {rsi14:.1f})"
+            )
+
+        # BUY
         elif (
-            price > ma200
+            above200
             and rsi14 < rsi_limit
         ):
 
+            explanation = (
+                "Reason:\n"
+                "• Above 200DMA ✅\n"
+                "• RSI below threshold ✅\n\n"
+                "Interpretation:\n"
+                "Healthy uptrend experiencing a pullback."
+            )
+
             buy.append(
-                f"{ticker}\n"
+                f"✅ {ticker}\n"
                 f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}"
+                f"RSI: {rsi14:.1f}\n\n"
+                f"{explanation}"
+            )
+
+        # WATCH
+        elif (
+            not above200
+            and rsi14 < 40
+        ):
+
+            explanation = (
+                "Reason:\n"
+                "• Oversold ✅\n"
+                "• Below 200DMA ❌\n\n"
+                "Interpretation:\n"
+                "Potential opportunity if trend improves."
+            )
+
+            watch.append(
+                f"👀 {ticker}\n"
+                f"Price: {price:.2f}\n"
+                f"RSI: {rsi14:.1f}\n"
+                f"Discount: {discount:.1f}%\n\n"
+                f"{explanation}"
+            )
+
+            summary_watch.append(
+                f"{ticker} (RSI {rsi14:.1f})"
+            )
+
+        # Weekly summary categorisation
+        if rsi14 > 70:
+            summary_extended.append(
+                f"{ticker} (RSI {rsi14:.1f})"
+            )
+
+        elif above200 and 40 <= rsi14 <= 70:
+            summary_healthy.append(
+                f"{ticker} (RSI {rsi14:.1f})"
             )
 
     except Exception as e:
         print(f"{ticker}: {e}")
 
-# Sunday summary
+# Sunday Summary
 if today == 6:
 
-    if summary:
-        message = "📊 Weekly Watchlist Summary\n\n" + "\n".join(summary)
-    else:
-        message = "📊 Weekly Watchlist Summary\n\nNo data available."
+    sections = ["📊 Weekly Watchlist Review"]
 
-# Weekday alerts
+    if summary_strong:
+        sections.append(
+            "🚨 STRONG BUY\n" +
+            "\n".join(summary_strong)
+        )
+
+    if summary_watch:
+        sections.append(
+            "👀 WATCH\n" +
+            "\n".join(summary_watch)
+        )
+
+    if summary_healthy:
+        sections.append(
+            "✅ HEALTHY TREND\n" +
+            "\n".join(summary_healthy)
+        )
+
+    if summary_extended:
+        sections.append(
+            "⚠️ EXTENDED\n" +
+            "\n".join(summary_extended)
+        )
+
+    message = "\n\n".join(sections)
+
+# Weekday Scans
 else:
 
     sections = ["📈 Watchlist Scan"]
 
     if strong_buy:
         sections.append(
-            "🚨 STRONG BUY\n\n" + "\n\n".join(strong_buy)
+            "🚨 STRONG BUY\n\n" +
+            "\n\n".join(strong_buy)
         )
 
     if buy:
         sections.append(
-            "✅ BUY\n\n" + "\n\n".join(buy)
+            "✅ BUY\n\n" +
+            "\n\n".join(buy)
         )
 
-    if not strong_buy and not buy:
-        sections.append("No buy opportunities today.")
+    if watch:
+        sections.append(
+            "👀 WATCH\n\n" +
+            "\n\n".join(watch)
+        )
+
+    if not strong_buy and not buy and not watch:
+        sections.append(
+            "No buy opportunities today."
+        )
 
     message = "\n\n".join(sections)
 

@@ -184,6 +184,20 @@ for ticker, rsi_limit in WATCHLIST.items():
         elif discount > 10:
             score += 5
 
+
+        # Overbought penalty
+
+        if rsi14 > 80:
+            score -= 20
+        elif rsi14 > 75:
+            score -= 15
+        elif rsi14 > 70:
+            score -= 10
+
+        # Prevent negative scores
+
+        score = max(score, 0)
+
         classification = classify(score)
 
         rankings.append(

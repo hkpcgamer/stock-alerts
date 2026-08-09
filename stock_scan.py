@@ -1,6 +1,5 @@
 import os
 import requests
-import pandas as pd
 import yfinance as yf
 from datetime import datetime
 
@@ -54,10 +53,7 @@ strong_buy = []
 buy = []
 watch = []
 
-summary_strong = []
-summary_watch = []
-summary_healthy = []
-summary_extended = []
+weekly_details = []
 
 for ticker, rsi_limit in WATCHLIST.items():
 
@@ -77,17 +73,10 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         price = float(close.iloc[-1])
 
-        ma50 = float(
-            close.rolling(50).mean().iloc[-1]
-        )
+        ma50 = float(close.rolling(50).mean().iloc[-1])
+        ma200 = float(close.rolling(200).mean().iloc[-1])
 
-        ma200 = float(
-            close.rolling(200).mean().iloc[-1]
-        )
-
-        rsi14 = float(
-            rsi(close).iloc[-1]
-        )
+        rsi14 = float(rsi(close).iloc[-1])
 
         high52 = float(close.max())
 
@@ -100,56 +89,43 @@ for ticker, rsi_limit in WATCHLIST.items():
         above50 = price > ma50
         above200 = price > ma200
 
-        if above50 and above200:
-            trend_status = "Strong Uptrend ✅✅"
-        elif above200:
-            trend_status = "Long-term Uptrend ✅"
-        else:
-            trend_status = "Trend Weak ❌"
+        status50 = "✅" if above50 else "❌"
+        status200 = "✅" if above200 else "❌"
+
+        # Weekly review line
+
+        weekly_details.append(
+            f"{ticker}\n"
+            f"RSI: {rsi14:.1f}\n"
+            f"50DMA: {status50}\n"
+            f"200DMA: {status200}\n"
+            f"{discount:.0f}% below high\n"
+        )
 
         # STRONG BUY
+
         if (
             above200
             and rsi14 < 35
             and discount > 10
         ):
 
-            explanation = (
-                f"Indicators:\n"
-                f"• RSI: {rsi14:.1f}\n"
-                f"• 50DMA: {ma50:.2f}\n"
-                f"• 200DMA: {ma200:.2f}\n"
-                f"• Discount from High: {discount:.1f}%\n\n"
-                f"Interpretation:\n"
-            )
-
-            if above50:
-                explanation += (
-                    "• Price above 50DMA ✅\n"
-                    "• Price above 200DMA ✅\n"
-                    "• Momentum and trend aligned ✅\n"
-                    "• Pullback creates opportunity ✅"
-                )
-            else:
-                explanation += (
-                    "• Price below 50DMA ⚠️\n"
-                    "• Price above 200DMA ✅\n"
-                    "• Long-term trend intact ✅\n"
-                    "• Recovery not yet confirmed"
-                )
-
             strong_buy.append(
                 f"🚨 {ticker}\n\n"
                 f"Price: {price:.2f}\n"
-                f"Trend: {trend_status}\n\n"
-                f"{explanation}"
-            )
-
-            summary_strong.append(
-                f"{ticker} (RSI {rsi14:.1f})"
+                f"RSI: {rsi14:.1f}\n"
+                f"50DMA: {status50}\n"
+                f"200DMA: {status200}\n"
+                f"Discount: {discount:.1f}%\n\n"
+                f"Interpretation:\n"
+                f"• Oversold (RSI below 35)\n"
+                f"• Long-term trend intact\n"
+                f"• Trading well below recent highs\n"
+                f"• Potential accumulation opportunity"
             )
 
         # BUY
+
         elif (
             above200
             and rsi14 < rsi_limit
@@ -159,14 +135,16 @@ for ticker, rsi_limit in WATCHLIST.items():
                 f"✅ {ticker}\n\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
-                f"50DMA: {ma50:.2f}\n"
-                f"200DMA: {ma200:.2f}\n"
-                f"Trend: {trend_status}\n\n"
+                f"50DMA: {status50}\n"
+                f"200DMA: {status200}\n\n"
                 f"Interpretation:\n"
-                f"Healthy uptrend experiencing a pullback."
+                f"• Pullback within an uptrend\n"
+                f"• Momentum remains healthy\n"
+                f"• Worth monitoring for entry"
             )
 
         # WATCH
+
         elif (
             not above200
             and rsi14 < 40
@@ -176,66 +154,26 @@ for ticker, rsi_limit in WATCHLIST.items():
                 f"👀 {ticker}\n\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
-                f"50DMA: {ma50:.2f}\n"
-                f"200DMA: {ma200:.2f}\n"
-                f"Discount from High: {discount:.1f}%\n\n"
+                f"50DMA: {status50}\n"
+                f"200DMA: {status200}\n"
+                f"Discount: {discount:.1f}%\n\n"
                 f"Interpretation:\n"
-                f"Oversold but still below the 200DMA. "
-                f"Wait for trend confirmation."
-            )
-
-            summary_watch.append(
-                f"{ticker} (RSI {rsi14:.1f})"
-            )
-
-        # Weekly summary classification
-
-        if rsi14 > 70:
-            summary_extended.append(
-                f"{ticker} (RSI {rsi14:.1f})"
-            )
-
-        elif above200 and 40 <= rsi14 <= 70:
-            summary_healthy.append(
-                f"{ticker} (RSI {rsi14:.1f})"
+                f"• Oversold\n"
+                f"• Long-term trend not yet confirmed\n"
+                f"• Watch for move back above 200DMA"
             )
 
     except Exception as e:
         print(f"{ticker}: {e}")
 
-# Sunday Summary
+# Sunday summary
 
 if today == 6:
 
-    sections = ["📊 Weekly Watchlist Review"]
+    message = "📊 Weekly Watchlist Review\n\n"
+    message += "\n".join(weekly_details)
 
-    if summary_strong:
-        sections.append(
-            "🚨 STRONG BUY\n" +
-            "\n".join(summary_strong)
-        )
-
-    if summary_watch:
-        sections.append(
-            "👀 WATCH\n" +
-            "\n".join(summary_watch)
-        )
-
-    if summary_healthy:
-        sections.append(
-            "✅ HEALTHY TREND\n" +
-            "\n".join(summary_healthy)
-        )
-
-    if summary_extended:
-        sections.append(
-            "⚠️ EXTENDED\n" +
-            "\n".join(summary_extended)
-        )
-
-    message = "\n\n".join(sections)
-
-# Weekday Scans
+# Weekday scans
 
 else:
 

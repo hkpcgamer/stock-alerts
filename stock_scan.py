@@ -76,11 +76,7 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         high52 = float(close.max())
 
-        discount = (
-            (high52 - price)
-            / high52
-            * 100
-        )
+        discount = ((high52 - price) / high52) * 100
 
         trend = "✅" if price > ma200 else "❌"
 
@@ -88,7 +84,6 @@ for ticker, rsi_limit in WATCHLIST.items():
             f"{ticker} | RSI {rsi14:.1f} | {discount:.0f}% off high | {trend}"
         )
 
-        # Strong Buy
         if (
             price > ma200
             and rsi14 < 35
@@ -99,10 +94,9 @@ for ticker, rsi_limit in WATCHLIST.items():
                 f"{ticker}\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
-                f"Discount from High: {discount:.1f}%\n"
+                f"Discount from High: {discount:.1f}%"
             )
 
-        # Buy
         elif (
             price > ma200
             and rsi14 < rsi_limit
@@ -111,7 +105,7 @@ for ticker, rsi_limit in WATCHLIST.items():
             buy.append(
                 f"{ticker}\n"
                 f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n"
+                f"RSI: {rsi14:.1f}"
             )
 
     except Exception as e:
@@ -120,17 +114,35 @@ for ticker, rsi_limit in WATCHLIST.items():
 # Sunday summary
 if today == 6:
 
-    message = "📊 Weekly Watchlist Summary\n\n"
-
     if summary:
-        message += "\n".join(summary)
+        message = "📊 Weekly Watchlist Summary\n\n" + "\n".join(summary)
     else:
-        message += "No data available."
+        message = "📊 Weekly Watchlist Summary\n\nNo data available."
 
-# Weekday scans
+# Weekday alerts
 else:
 
-    message = "📈 Watchlist Scan\n\n"
+    sections = ["📈 Watchlist Scan"]
 
     if strong_buy:
-        message += "🚨 STRONG 
+        sections.append(
+            "🚨 STRONG BUY\n\n" + "\n\n".join(strong_buy)
+        )
+
+    if buy:
+        sections.append(
+            "✅ BUY\n\n" + "\n\n".join(buy)
+        )
+
+    if not strong_buy and not buy:
+        sections.append("No buy opportunities today.")
+
+    message = "\n\n".join(sections)
+
+requests.post(
+    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+    json={
+        "chat_id": CHAT_ID,
+        "text": message
+    }
+)

@@ -158,13 +158,44 @@ for ticker, rsi_limit in WATCHLIST.items():
             and ma50 < ma200
         )
 
-        high_6m = close.tail(126).max()
+        
+        # Strict Cup & Handle Detection
+
+        window = close.tail(252)  # ~12 months
+
+        left_side = window.iloc[:126]
+        right_side = window.iloc[126:]
+
+        left_peak = float(left_side.max())
+        bottom = float(window.min())
+        right_peak = float(right_side.max())
+
+        cup_depth = (
+            (left_peak - bottom)
+            / left_peak
+        )
+
+        near_old_high = (
+            abs(right_peak - left_peak)
+            / left_peak
+            < 0.05
+        )
+
+        handle_low = float(
+            close.tail(20).min()
+        )
+
+        handle_depth = (
+            (right_peak - handle_low)
+            / right_peak
+        )
 
         cup_handle = (
-            price > ma50
+            0.10 < cup_depth < 0.35
+            and near_old_high
+            and handle_depth < 0.15
+            and price > ma50
             and price > ma200
-            and 5 < discount < 20 
-            and rsi14 < 65
         )
 
         high52 = float(close.max())
@@ -240,10 +271,12 @@ for ticker, rsi_limit in WATCHLIST.items():
             )
 
         if cup_handle:
-            events.append(
-                f"🔄 CUP & HANDLE CANDIDATE\n{ticker}"
+            events.append( 
+                f"🔄 CUP & HANDLE\n" 
+                f"{ticker}\n" 
+                f"Cup Depth: {cup_depth:.0%}" 
             )
-
+            
         rankings.append(
             (score, ticker, classification)
         )

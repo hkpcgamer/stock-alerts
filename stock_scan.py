@@ -167,21 +167,24 @@ for ticker, rsi_limit in WATCHLIST.items():
             and discount > 10
         ):
 
-            strong_buy.append(
-                f"🚨 {ticker}\n\n"
-                f"Score: {score}/100\n"
-                f"Classification: {classification}\n\n"
-                f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n"
-                f"50DMA: {status50}\n"
-                f"200DMA: {status200}\n"
-                f"Discount: {discount:.1f}%\n\n"
-                f"Interpretation:\n"
-                f"• Oversold (RSI below 35)\n"
-                f"• Long-term trend intact\n"
-                f"• Trading below recent highs\n"
-                f"• Potential accumulation opportunity"
-            )
+strong_buy.append(
+    f"🚨 {ticker}\n\n"
+    f"Score: {score}/100\n"
+    f"Classification: {classification}\n"
+    f"Trend: {trend}\n\n"
+    f"Price: {price:.2f}\n"
+    f"RSI: {rsi14:.1f}\n"
+    f"50DMA: {status50}\n"
+    f"200DMA: {status200}\n"
+    f"Discount: {discount:.1f}%\n\n"
+    f"Technical Thesis:\n"
+    f"• Oversold (RSI below 35)\n"
+    f"• Long-term trend intact\n"
+    f"• Trading below recent highs\n"
+    f"• Potential accumulation opportunity"
+    f"{news_section}"
+)
+
 
         # BUY
 
@@ -326,3 +329,22 @@ elif rsi14 > 75:
     score -= 15
 elif rsi14 > 70:
     score -= 10
+news_section = ""
+
+try:
+    stock = yf.Ticker(ticker)
+
+    news = stock.news[:4]
+
+    if news:
+
+        news_section = "\n\n📰 Recent News\n"
+
+        for article in news:
+
+            title = article.get("title", "No title")
+
+            news_section += f"• {title}\n"
+
+except Exception:
+    pass

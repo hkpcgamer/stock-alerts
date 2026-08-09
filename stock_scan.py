@@ -27,10 +27,10 @@ WATCHLIST = [
     "PSX",
     "TSLA",
     "SCHD",
-    "VIG"
-    "293.HK"
-    "SPCX"
-    "SMH"
+    "VIG",
+    "293.HK",
+    "SPCX",
+    "SMH",
     "0083.HK"
 ]
 def rsi(series, period=14):
@@ -56,18 +56,20 @@ for ticker in WATCHLIST:
             progress=False,
             auto_adjust=True
         )
-        close = data["Close"]
-ma200 = close.rolling(200).mean().iloc[-1]
-price = close.iloc[-1]
-rsi14 = rsi(close).iloc[-1]
+         close = data["Close"]
 
-if price > ma200:
-    message_lines.append(
-        f"{ticker}\n"
-        f"Price: {price:.2f}\n"
-        f"RSI: {rsi14:.1f}\n"
-        f"Above 200DMA ✅\n"
-    )
+        ma200 = close.rolling(200).mean().iloc[-1]
+        price = close.iloc[-1]
+        rsi14 = rsi(close).iloc[-1]
+
+        if price > ma200:
+            message_lines.append(
+                f"{ticker}\n"
+                f"Price: {price:.2f}\n"
+                f"RSI: {rsi14:.1f}\n"
+                f"Above 200DMA ✅\n"
+            )
+
 
     except Exception as e:
         print(e)

@@ -115,6 +115,7 @@ watch = []
 
 weekly_details = []
 rankings = []
+events = []
 
 for ticker, rsi_limit in WATCHLIST.items():
 
@@ -138,6 +139,33 @@ for ticker, rsi_limit in WATCHLIST.items():
         ma200 = float(close.rolling(200).mean().iloc[-1])
 
         rsi14 = float(rsi(close).iloc[-1])
+
+        ma50_yesterday = float(
+            close.rolling(50).mean().iloc[-2]
+        )
+
+        ma200_yesterday = float(
+            close.rolling(200).mean().iloc[-2]
+        )
+
+        golden_cross = (
+            ma50_yesterday <= ma200_yesterday
+            and ma50 > ma200
+        )
+
+        death_cross = (
+            ma50_yesterday >= ma200_yesterday
+            and ma50 < ma200
+        )
+
+        high_6m = close.tail(126).max()
+
+        cup_handle = (
+            price > ma50
+            and price > ma200
+            and (high_6m - price) / high_6m < 0.05
+            and rsi14 < 70
+        )
 
         high52 = float(close.max())
 
@@ -200,6 +228,21 @@ for ticker, rsi_limit in WATCHLIST.items():
         score = max(score, 0)
 
         classification = classify(score)
+
+        if golden_cross:
+            events.append(
+                f"✅ GOLDEN CROSS\n{ticker}"
+            )
+
+        if death_cross:
+            events.append(
+                f"❌ DEATH CROSS\n{ticker}"
+            )
+
+        if cup_handle:
+            events.append(
+                f"🔄 CUP & HANDLE CANDIDATE\n{ticker}"
+            )
 
         rankings.append(
             (score, ticker, classification)
@@ -321,6 +364,14 @@ if today == 6:
 
     message = "📊 Weekly Watchlist Review\n\n"
 
+    if events:
+
+    message += (
+        "🔔 TECHNICAL EVENTS\n\n"
+        + "\n\n".join(events)
+        + "\n\n"
+    )
+
     message += "🏆 TOP TECHNICAL OPPORTUNITIES\n\n"
 
     for rank, item in enumerate(top5, start=1):
@@ -348,10 +399,17 @@ else:
             f"({item[2]})"
         )
 
-    sections = [
-        "📈 Watchlist Scan",
-        "\n".join(leaderboard)
-    ]
+    sections = ["📈 Watchlist Scan"] 
+    
+    if events: 
+        sections.append( 
+            "🔔 TECHNICAL EVENTS\n\n" + 
+            "\n\n".join(events) 
+        )
+        
+    sections.append( 
+        "\n".join(leaderboard) 
+    )
 
     if strong_buy:
         sections.append(

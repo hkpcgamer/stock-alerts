@@ -80,11 +80,7 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         high52 = float(close.max())
 
-        discount = (
-            (high52 - price)
-            / high52
-            * 100
-        )
+        discount = ((high52 - price) / high52) * 100
 
         above50 = price > ma50
         above200 = price > ma200
@@ -92,10 +88,36 @@ for ticker, rsi_limit in WATCHLIST.items():
         status50 = "✅" if above50 else "❌"
         status200 = "✅" if above200 else "❌"
 
-        # Weekly review line
+        # Score out of 10
+
+        score = 0
+
+        # Trend (4 points)
+        if above200:
+            score += 2
+
+        if above50:
+            score += 2
+
+        # RSI (3 points)
+        if rsi14 < 30:
+            score += 3
+        elif rsi14 < 35:
+            score += 2
+        elif rsi14 < 45:
+            score += 1
+
+        # Discount from high (3 points)
+        if discount > 30:
+            score += 3
+        elif discount > 20:
+            score += 2
+        elif discount > 10:
+            score += 1
 
         weekly_details.append(
             f"{ticker}\n"
+            f"Score: {score}/10\n"
             f"RSI: {rsi14:.1f}\n"
             f"50DMA: {status50}\n"
             f"200DMA: {status200}\n"
@@ -112,6 +134,7 @@ for ticker, rsi_limit in WATCHLIST.items():
 
             strong_buy.append(
                 f"🚨 {ticker}\n\n"
+                f"Score: {score}/10\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
                 f"50DMA: {status50}\n"
@@ -133,6 +156,7 @@ for ticker, rsi_limit in WATCHLIST.items():
 
             buy.append(
                 f"✅ {ticker}\n\n"
+                f"Score: {score}/10\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
                 f"50DMA: {status50}\n"
@@ -152,6 +176,7 @@ for ticker, rsi_limit in WATCHLIST.items():
 
             watch.append(
                 f"👀 {ticker}\n\n"
+                f"Score: {score}/10\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
                 f"50DMA: {status50}\n"

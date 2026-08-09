@@ -30,7 +30,8 @@ WATCHLIST = {
     "SCHD": 35,
     "VIG": 35,
     "SPCX": 40,
-    "SMH": 40
+    "SMH": 40,
+    "IAU": 40
 }
 
 

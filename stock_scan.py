@@ -6,7 +6,28 @@ import yfinance as yf
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
-WATCHLIST = ["META", "BAC", "SCHD"]
+WATCHLIST = [
+    "1475.T",
+    "0087.HK",
+    "LAMR",
+    "MPLX",
+    "MU",
+    "MRVL",
+    "EIX",
+    "PLTR",
+    "BAC",
+    "BRK-B",
+    "COST",
+    "DIS",
+    "HD",
+    "PG",
+    "MC.PA",
+    "META",
+    "PSX",
+    "TSLA",
+    "SCHD",
+    "VIG"
+]
 
 message_lines = []
 

@@ -59,13 +59,18 @@ for ticker in WATCHLIST:
 
         close = data["Close"]
 
-        ma200 = close.rolling(200).mean().iloc[-1]
-        price = close.iloc[-1]
+ma200 = close.rolling(200).mean().iloc[-1]
+price = close.iloc[-1]
 
-        if price > ma200:
-            message_lines.append(
-                f"{ticker}: Above 200DMA ✅"
-            )
+rsi14 = rsi(close).iloc[-1]
+
+if price > ma200:
+    message_lines.append(
+        f"{ticker}\n"
+        f"Price: {price:.2f}\n"
+        f"RSI: {rsi14:.1f}\n"
+        f"Above 200DMA ✅\n"
+    )
 
     except Exception as e:
         print(e)

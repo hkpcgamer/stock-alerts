@@ -211,21 +211,20 @@ for ticker, rsi_limit in WATCHLIST.items():
             and discount > 10
         ):
 
-        news_section = ""
+            news_section = ""
 
-        if FINNHUB_API_KEY:
+            if FINNHUB_API_KEY:
 
-            news_list = get_news(ticker)
+                news_list = get_news(ticker)
 
-        if news_list:
+                if news_list:
 
-            news_section = "\n\n📰 Recent News\n"
+                    news_section = "\n\n📰 Recent News\n"
 
-        for headline in news_list:
-            news_section += f"• {headline}\n"
+                    for headline in news_list:
+                        news_section += f"• {headline}\n"
 
-        strong_buy.append(
-
+            strong_buy.append(
                 f"🚨 {ticker}\n\n"
                 f"Score: {score}/100\n"
                 f"Classification: {classification}\n"
@@ -242,7 +241,6 @@ for ticker, rsi_limit in WATCHLIST.items():
                 f"• Potential accumulation opportunity"
                 f"{news_section}"
             )
-
 
         # BUY
 

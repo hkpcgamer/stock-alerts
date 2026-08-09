@@ -365,12 +365,11 @@ if today == 6:
     message = "📊 Weekly Watchlist Review\n\n"
 
     if events:
-
-    message += (
-        "🔔 TECHNICAL EVENTS\n\n"
-        + "\n\n".join(events)
-        + "\n\n"
-    )
+        message += (
+            "🔔 TECHNICAL EVENTS\n\n"
+            + "\n\n".join(events)
+            + "\n\n"
+        )
 
     message += "🏆 TOP TECHNICAL OPPORTUNITIES\n\n"
 

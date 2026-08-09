@@ -163,8 +163,8 @@ for ticker, rsi_limit in WATCHLIST.items():
         cup_handle = (
             price > ma50
             and price > ma200
-            and (high_6m - price) / high_6m < 0.05
-            and rsi14 < 70
+            and 5 < discount < 20 
+            and rsi14 < 65
         )
 
         high52 = float(close.max())

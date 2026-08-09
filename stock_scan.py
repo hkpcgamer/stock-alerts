@@ -32,12 +32,15 @@ for ticker in WATCHLIST:
             message_lines.append(f"{ticker}: No data")
             continue
 
-        close = data["Close"]
+        close = data["Close"].squeeze()
 
         price = float(close.iloc[-1])
         ma200 = float(close.rolling(200).mean().iloc[-1])
 
-        status = "✅ Above 200DMA" if price > ma200 else "❌ Below 200DMA"
+        if price > ma200:
+            status = "✅ Above 200DMA"
+        else:
+            status = "❌ Below 200DMA"
 
         message_lines.append(
             f"{ticker}\n"
@@ -47,7 +50,9 @@ for ticker in WATCHLIST:
         )
 
     except Exception as e:
-        message_lines.append(f"{ticker}: ERROR {str(e)}")
+        message_lines.append(
+            f"{ticker}: ERROR {str(e)}"
+        )
 
 message = "\n".join(message_lines)
 

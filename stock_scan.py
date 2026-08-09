@@ -47,6 +47,21 @@ def rsi(series, period=14):
     return 100 - (100 / (1 + rs))
 
 
+def classify(score):
+    if score >= 90:
+        return "🏆 Exceptional Setup"
+    elif score >= 75:
+        return "🚨 Strong Opportunity"
+    elif score >= 60:
+        return "✅ Attractive"
+    elif score >= 40:
+        return "👀 Watch Closely"
+    elif score >= 20:
+        return "⚪ Neutral"
+    else:
+        return "❌ Weak Setup"
+
+
 today = datetime.utcnow().weekday()
 
 strong_buy = []
@@ -54,6 +69,7 @@ buy = []
 watch = []
 
 weekly_details = []
+rankings = []
 
 for ticker, rsi_limit in WATCHLIST.items():
 
@@ -88,40 +104,59 @@ for ticker, rsi_limit in WATCHLIST.items():
         status50 = "✅" if above50 else "❌"
         status200 = "✅" if above200 else "❌"
 
-        # Score out of 10
+        # Technical Opportunity Score (100)
 
         score = 0
 
-        # Trend (4 points)
+        # Trend (55 points)
+
         if above200:
-            score += 2
+            score += 40
 
         if above50:
-            score += 2
+            score += 15
 
-        # RSI (3 points)
+        # RSI (25 points)
+
         if rsi14 < 30:
-            score += 3
+            score += 25
         elif rsi14 < 35:
-            score += 2
+            score += 20
+        elif rsi14 < 40:
+            score += 15
         elif rsi14 < 45:
-            score += 1
+            score += 10
+        elif rsi14 < 50:
+            score += 5
 
-        # Discount from high (3 points)
-        if discount > 30:
-            score += 3
+        # Discount from high (20 points)
+
+        if discount > 40:
+            score += 20
+        elif discount > 30:
+            score += 15
         elif discount > 20:
-            score += 2
+            score += 10
         elif discount > 10:
-            score += 1
+            score += 5
+
+        classification = classify(score)
+
+        rankings.append(
+            (score, ticker, classification)
+        )
 
         weekly_details.append(
-            f"{ticker}\n"
-            f"Score: {score}/10\n"
-            f"RSI: {rsi14:.1f}\n"
-            f"50DMA: {status50}\n"
-            f"200DMA: {status200}\n"
-            f"{discount:.0f}% below high\n"
+            (
+                score,
+                f"{ticker}\n"
+                f"Score: {score}/100\n"
+                f"Classification: {classification}\n"
+                f"RSI: {rsi14:.1f}\n"
+                f"50DMA: {status50}\n"
+                f"200DMA: {status200}\n"
+                f"{discount:.0f}% below high\n"
+            )
         )
 
         # STRONG BUY
@@ -134,7 +169,8 @@ for ticker, rsi_limit in WATCHLIST.items():
 
             strong_buy.append(
                 f"🚨 {ticker}\n\n"
-                f"Score: {score}/10\n"
+                f"Score: {score}/100\n"
+                f"Classification: {classification}\n\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
                 f"50DMA: {status50}\n"
@@ -143,7 +179,7 @@ for ticker, rsi_limit in WATCHLIST.items():
                 f"Interpretation:\n"
                 f"• Oversold (RSI below 35)\n"
                 f"• Long-term trend intact\n"
-                f"• Trading well below recent highs\n"
+                f"• Trading below recent highs\n"
                 f"• Potential accumulation opportunity"
             )
 
@@ -156,7 +192,8 @@ for ticker, rsi_limit in WATCHLIST.items():
 
             buy.append(
                 f"✅ {ticker}\n\n"
-                f"Score: {score}/10\n"
+                f"Score: {score}/100\n"
+                f"Classification: {classification}\n\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
                 f"50DMA: {status50}\n"
@@ -176,7 +213,8 @@ for ticker, rsi_limit in WATCHLIST.items():
 
             watch.append(
                 f"👀 {ticker}\n\n"
-                f"Score: {score}/10\n"
+                f"Score: {score}/100\n"
+                f"Classification: {classification}\n\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
                 f"50DMA: {status50}\n"
@@ -191,18 +229,55 @@ for ticker, rsi_limit in WATCHLIST.items():
     except Exception as e:
         print(f"{ticker}: {e}")
 
-# Sunday summary
+rankings.sort(
+    key=lambda x: x[0],
+    reverse=True
+)
+
+top5 = rankings[:5]
+
+# Sunday Review
 
 if today == 6:
 
-    message = "📊 Weekly Watchlist Review\n\n"
-    message += "\n".join(weekly_details)
+    weekly_details.sort(
+        key=lambda x: x[0],
+        reverse=True
+    )
 
-# Weekday scans
+    message = "📊 Weekly Watchlist Review\n\n"
+
+    message += "🏆 TOP TECHNICAL OPPORTUNITIES\n\n"
+
+    for rank, item in enumerate(top5, start=1):
+        message += (
+            f"{rank}. {item[1]} — "
+            f"{item[0]}/100 "
+            f"({item[2]})\n"
+        )
+
+    message += "\n\n"
+
+    for _, detail in weekly_details:
+        message += detail + "\n"
+
+# Weekday Scan
 
 else:
 
-    sections = ["📈 Watchlist Scan"]
+    leaderboard = ["🏆 TOP TECHNICAL OPPORTUNITIES"]
+
+    for rank, item in enumerate(top5, start=1):
+        leaderboard.append(
+            f"{rank}. {item[1]} — "
+            f"{item[0]}/100 "
+            f"({item[2]})"
+        )
+
+    sections = [
+        "📈 Watchlist Scan",
+        "\n".join(leaderboard)
+    ]
 
     if strong_buy:
         sections.append(

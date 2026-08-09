@@ -311,3 +311,18 @@ requests.post(
         "text": message
     }
 )
+def trend_state(above50, above200):
+    if above50 and above200:
+        return "✅ Strong Uptrend"
+    elif (not above50) and above200:
+        return "⚠️ Pullback in Uptrend"
+    elif above50 and (not above200):
+        return "🔄 Recovery Attempt"
+    else:
+        return "❌ Downtrend"
+if rsi14 > 80:
+    score -= 20
+elif rsi14 > 75:
+    score -= 15
+elif rsi14 > 70:
+    score -= 10

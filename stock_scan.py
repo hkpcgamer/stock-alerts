@@ -211,7 +211,7 @@ for ticker, rsi_limit in WATCHLIST.items():
             and discount > 10
         ):
 
-            news_section = ""
+        news_section = ""
 
         if FINNHUB_API_KEY:
 
@@ -224,7 +224,8 @@ for ticker, rsi_limit in WATCHLIST.items():
         for headline in news_list:
             news_section += f"• {headline}\n"
 
-            strong_buy.append(
+        strong_buy.append(
+
                 f"🚨 {ticker}\n\n"
                 f"Score: {score}/100\n"
                 f"Classification: {classification}\n"

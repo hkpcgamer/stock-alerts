@@ -5,6 +5,7 @@ from datetime import datetime
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
+FINNHUB_API_KEY = os.environ["FINNHUB_API_KEY"]
 
 WATCHLIST = {
     "1475.T": 40,
@@ -46,7 +47,6 @@ def rsi(series, period=14):
 
     return 100 - (100 / (1 + rs))
 
-
 def classify(score):
     if score >= 90:
         return "🏆 Exceptional Setup"
@@ -60,6 +60,50 @@ def classify(score):
         return "⚪ Neutral"
     else:
         return "❌ Weak Setup"
+
+
+def get_news(ticker):
+
+    try:
+
+        from datetime import date, timedelta
+
+        today = date.today()
+        start = today - timedelta(days=30)
+
+        url = (
+            f"https://finnhub.io/api/v1/company-news"
+            f"?symbol={ticker}"
+            f"&from={start}"
+            f"&to={today}"
+            f"&token={FINNHUB_API_KEY}"
+        )
+
+        response = requests.get(
+            url,
+            timeout=10
+        )
+
+        articles = response.json()
+
+        headlines = []
+
+        for article in articles[:4]:
+
+            headline = article.get(
+                "headline"
+            )
+
+            if headline:
+                headlines.append(
+                    headline
+                )
+
+        return headlines
+
+    except Exception:
+
+        return []
 
 
 today = datetime.utcnow().weekday()

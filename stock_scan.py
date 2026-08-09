@@ -62,6 +62,19 @@ def classify(score):
         return "❌ Weak Setup"
 
 
+# Function to compute trend state
+
+def trend_state(above50, above200):
+    if above50 and above200:
+        return "✅ Strong Uptrend"
+    elif (not above50) and above200:
+        return "⚠️ Pullback in Uptrend"
+    elif above50 and (not above200):
+        return "🔄 Recovery Attempt"
+    else:
+        return "❌ Downtrend"
+
+
 today = datetime.utcnow().weekday()
 
 strong_buy = []
@@ -74,7 +87,6 @@ rankings = []
 for ticker, rsi_limit in WATCHLIST.items():
 
     try:
-
         data = yf.download(
             ticker,
             period="1y",
@@ -103,13 +115,12 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         status50 = "✅" if above50 else "❌"
         status200 = "✅" if above200 else "❌"
+        trend = trend_state(above50, above200)
 
         # Technical Opportunity Score (100)
-
         score = 0
 
         # Trend (55 points)
-
         if above200:
             score += 40
 
@@ -117,7 +128,6 @@ for ticker, rsi_limit in WATCHLIST.items():
             score += 15
 
         # RSI (25 points)
-
         if rsi14 < 30:
             score += 25
         elif rsi14 < 35:
@@ -130,7 +140,6 @@ for ticker, rsi_limit in WATCHLIST.items():
             score += 5
 
         # Discount from high (20 points)
-
         if discount > 40:
             score += 20
         elif discount > 30:
@@ -140,169 +149,226 @@ for ticker, rsi_limit in WATCHLIST.items():
         elif discount > 10:
             score += 5
 
+        # Overbought penalty
+        if rsi14 > 80:
+            score -= 20
+        elif rsi14 > 75:
+            score -= 15
+        elif rsi14 > 70:
+            score -= 10
+
         classification = classify(score)
 
-        rankings.append(
-            (score, ticker, classification)
-        )
+        rankings.append((score, ticker, classification))
 
         weekly_details.append(
             (
                 score,
-                f"{ticker}\n"
-                f"Score: {score}/100\n"
-                f"Classification: {classification}\n"
-                f"RSI: {rsi14:.1f}\n"
-                f"50DMA: {status50}\n"
-                f"200DMA: {status200}\n"
-                f"{discount:.0f}% below high\n"
+                f"{ticker}
+"
+                f"Score: {score}/100
+"
+                f"Classification: {classification}
+"
+                f"Trend: {trend}
+"
+                f"RSI: {rsi14:.1f}
+"
+                f"50DMA: {status50}
+"
+                f"200DMA: {status200}
+"
+                f"{discount:.0f}% below high
+"
             )
         )
 
         # STRONG BUY
-
         if (
             above200
             and rsi14 < 35
             and discount > 10
         ):
-
             strong_buy.append(
-                f"🚨 {ticker}\n\n"
-                f"Score: {score}/100\n"
-                f"Classification: {classification}\n\n"
-                f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n"
-                f"50DMA: {status50}\n"
-                f"200DMA: {status200}\n"
-                f"Discount: {discount:.1f}%\n\n"
-                f"Interpretation:\n"
-                f"• Oversold (RSI below 35)\n"
-                f"• Long-term trend intact\n"
-                f"• Trading below recent highs\n"
+                f"🚨 {ticker}
+
+"
+                f"Score: {score}/100
+"
+                f"Classification: {classification}
+"
+                f"Trend: {trend}
+
+"
+                f"Price: {price:.2f}
+"
+                f"RSI: {rsi14:.1f}
+"
+                f"50DMA: {status50}
+"
+                f"200DMA: {status200}
+"
+                f"Discount: {discount:.1f}%
+
+"
+                f"Interpretation:
+"
+                f"• Oversold (RSI below 35)
+"
+                f"• Long-term trend intact
+"
+                f"• Trading below recent highs
+"
                 f"• Potential accumulation opportunity"
             )
 
         # BUY
-
         elif (
             above200
             and rsi14 < rsi_limit
         ):
-
             buy.append(
-                f"✅ {ticker}\n\n"
-                f"Score: {score}/100\n"
-                f"Classification: {classification}\n\n"
-                f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n"
-                f"50DMA: {status50}\n"
-                f"200DMA: {status200}\n\n"
-                f"Interpretation:\n"
-                f"• Pullback within an uptrend\n"
-                f"• Momentum remains healthy\n"
+                f"✅ {ticker}
+
+"
+                f"Score: {score}/100
+"
+                f"Classification: {classification}
+"
+                f"Trend: {trend}
+
+"
+                f"Price: {price:.2f}
+"
+                f"RSI: {rsi14:.1f}
+"
+                f"50DMA: {status50}
+"
+                f"200DMA: {status200}
+
+"
+                f"Interpretation:
+"
+                f"• Pullback within an uptrend
+"
+                f"• Momentum remains healthy
+"
                 f"• Worth monitoring for entry"
             )
 
         # WATCH
-
         elif (
             not above200
             and rsi14 < 40
         ):
-
             watch.append(
-                f"👀 {ticker}\n\n"
-                f"Score: {score}/100\n"
-                f"Classification: {classification}\n\n"
-                f"Price: {price:.2f}\n"
-                f"RSI: {rsi14:.1f}\n"
-                f"50DMA: {status50}\n"
-                f"200DMA: {status200}\n"
-                f"Discount: {discount:.1f}%\n\n"
-                f"Interpretation:\n"
-                f"• Oversold\n"
-                f"• Long-term trend not yet confirmed\n"
+                f"👀 {ticker}
+
+"
+                f"Score: {score}/100
+"
+                f"Classification: {classification}
+"
+                f"Trend: {trend}
+
+"
+                f"Price: {price:.2f}
+"
+                f"RSI: {rsi14:.1f}
+"
+                f"50DMA: {status50}
+"
+                f"200DMA: {status200}
+"
+                f"Discount: {discount:.1f}%
+
+"
+                f"Interpretation:
+"
+                f"• Oversold
+"
+                f"• Long-term trend not yet confirmed
+"
                 f"• Watch for move back above 200DMA"
             )
 
     except Exception as e:
         print(f"{ticker}: {e}")
 
-rankings.sort(
-    key=lambda x: x[0],
-    reverse=True
-)
+rankings.sort(key=lambda x: x[0], reverse=True)
 
 top5 = rankings[:5]
 
 # Sunday Review
-
 if today == 6:
+    weekly_details.sort(key=lambda x: x[0], reverse=True)
+    message = "📊 Weekly Watchlist Review
 
-    weekly_details.sort(
-        key=lambda x: x[0],
-        reverse=True
-    )
+"
+    message += "🏆 TOP TECHNICAL OPPORTUNITIES
 
-    message = "📊 Weekly Watchlist Review\n\n"
-
-    message += "🏆 TOP TECHNICAL OPPORTUNITIES\n\n"
-
+"
     for rank, item in enumerate(top5, start=1):
         message += (
             f"{rank}. {item[1]} — "
             f"{item[0]}/100 "
-            f"({item[2]})\n"
+            f"({item[2]})
+"
         )
+    message += "
 
-    message += "\n\n"
-
+"
     for _, detail in weekly_details:
-        message += detail + "\n"
-
+        message += detail + "
+"
 # Weekday Scan
-
 else:
-
     leaderboard = ["🏆 TOP TECHNICAL OPPORTUNITIES"]
-
     for rank, item in enumerate(top5, start=1):
         leaderboard.append(
             f"{rank}. {item[1]} — "
             f"{item[0]}/100 "
             f"({item[2]})"
         )
-
     sections = [
         "📈 Watchlist Scan",
-        "\n".join(leaderboard)
+        "
+".join(leaderboard)
     ]
-
     if strong_buy:
         sections.append(
-            "🚨 STRONG BUY\n\n" +
-            "\n\n".join(strong_buy)
-        )
+            "🚨 STRONG BUY
 
+" +
+            "
+
+".join(strong_buy)
+        )
     if buy:
         sections.append(
-            "✅ BUY\n\n" +
-            "\n\n".join(buy)
-        )
+            "✅ BUY
 
+" +
+            "
+
+".join(buy)
+        )
     if watch:
         sections.append(
-            "👀 WATCH\n\n" +
-            "\n\n".join(watch)
-        )
+            "👀 WATCH
 
+" +
+            "
+
+".join(watch)
+        )
     if not strong_buy and not buy and not watch:
         sections.append(
             "No buy opportunities today."
         )
+    message = "
 
-    message = "\n\n".join(sections)
+".join(sections)
 
 requests.post(
     f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",

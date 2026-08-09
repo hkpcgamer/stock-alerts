@@ -2,6 +2,7 @@ import os
 import requests
 import pandas as pd
 import yfinance as yf
+from datetime import datetime
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
@@ -47,12 +48,16 @@ def rsi(series, period=14):
     return 100 - (100 / (1 + rs))
 
 
+today = datetime.utcnow().weekday()
+
 strong_buy = []
 buy = []
+summary = []
 
 for ticker, rsi_limit in WATCHLIST.items():
 
     try:
+
         data = yf.download(
             ticker,
             period="1y",
@@ -72,7 +77,15 @@ for ticker, rsi_limit in WATCHLIST.items():
         high52 = float(close.max())
 
         discount = (
-            (high52 - price) / high52 * 100
+            (high52 - price)
+            / high52
+            * 100
+        )
+
+        trend = "✅" if price > ma200 else "❌"
+
+        summary.append(
+            f"{ticker} | RSI {rsi14:.1f} | {discount:.0f}% off high | {trend}"
         )
 
         if (
@@ -80,17 +93,19 @@ for ticker, rsi_limit in WATCHLIST.items():
             and rsi14 < 35
             and discount > 10
         ):
+
             strong_buy.append(
                 f"{ticker}\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
-                f"Discount from High: {discount:.1f}%\n"
+                f"Discount: {discount:.1f}%\n"
             )
 
         elif (
             price > ma200
             and rsi14 < rsi_limit
         ):
+
             buy.append(
                 f"{ticker}\n"
                 f"Price: {price:.2f}\n"
@@ -100,20 +115,29 @@ for ticker, rsi_limit in WATCHLIST.items():
     except Exception as e:
         print(f"{ticker}: {e}")
 
-message = "📈 Watchlist Scan\n\n"
+# Sunday summary
+if today == 6:
 
-if strong_buy:
-    message += "🚨 STRONG BUY\n\n"
-    message += "\n".join(strong_buy)
-    message += "\n\n"
+    message = "📊 Weekly Watchlist Summary\n\n"
+    message += "\n".join(summary)
 
-if buy:
-    message += "✅ BUY\n\n"
-    message += "\n".join(buy)
-    message += "\n\n"
+# Daily alerts
+else:
 
-if not strong_buy and not buy:
-    message += "No buy opportunities today."
+    message = "📈 Watchlist Scan\n\n"
+
+    if strong_buy:
+        message += "🚨 STRONG BUY\n\n"
+        message += "\n".join(strong_buy)
+        message += "\n\n"
+
+    if buy:
+        message += "✅ BUY\n\n"
+        message += "\n".join(buy)
+        message += "\n\n"
+
+    if not strong_buy and not buy:
+        message += "No buy opportunities today."
 
 requests.post(
     f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",

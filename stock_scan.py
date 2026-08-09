@@ -88,6 +88,7 @@ for ticker, rsi_limit in WATCHLIST.items():
             f"{ticker} | RSI {rsi14:.1f} | {discount:.0f}% off high | {trend}"
         )
 
+        # Strong Buy
         if (
             price > ma200
             and rsi14 < 35
@@ -98,9 +99,10 @@ for ticker, rsi_limit in WATCHLIST.items():
                 f"{ticker}\n"
                 f"Price: {price:.2f}\n"
                 f"RSI: {rsi14:.1f}\n"
-                f"Discount: {discount:.1f}%\n"
+                f"Discount from High: {discount:.1f}%\n"
             )
 
+        # Buy
         elif (
             price > ma200
             and rsi14 < rsi_limit
@@ -119,30 +121,16 @@ for ticker, rsi_limit in WATCHLIST.items():
 if today == 6:
 
     message = "📊 Weekly Watchlist Summary\n\n"
-    message += "\n".join(summary)
 
-# Daily alerts
+    if summary:
+        message += "\n".join(summary)
+    else:
+        message += "No data available."
+
+# Weekday scans
 else:
 
     message = "📈 Watchlist Scan\n\n"
 
     if strong_buy:
-        message += "🚨 STRONG BUY\n\n"
-        message += "\n".join(strong_buy)
-        message += "\n\n"
-
-    if buy:
-        message += "✅ BUY\n\n"
-        message += "\n".join(buy)
-        message += "\n\n"
-
-    if not strong_buy and not buy:
-        message += "No buy opportunities today."
-
-requests.post(
-    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-    json={
-        "chat_id": CHAT_ID,
-        "text": message
-    }
-)
+        message += "🚨 STRONG 

@@ -116,6 +116,7 @@ watch = []
 weekly_details = []
 rankings = []
 events = []
+daily_details = []
 
 for ticker, rsi_limit in WATCHLIST.items():
 
@@ -281,6 +282,19 @@ for ticker, rsi_limit in WATCHLIST.items():
             (score, ticker, classification)
         )
 
+
+        daily_details.append(
+        (
+            score,
+            f"{ticker}\n"
+            f"Score: {score}/100\n"
+            f"Classification: {classification}\n"
+            f"RSI: {rsi14:.1f}\n"
+            f"50DMA: {status50}\n"
+            f"200DMA: {status200}\n"
+            f"{discount:.0f}% below high\n"
+        )
+    )
         weekly_details.append(
             (
                 score,
@@ -431,7 +445,13 @@ else:
             f"({item[2]})"
         )
 
-    sections = ["📈 Watchlist Scan"] 
+    sdaily_details.sort(
+    key=lambda x: x[0],
+    reverse=True
+)
+
+    sections = ["📈 Watchlist Scan"]
+
     
     if events: 
         sections.append( 
@@ -443,6 +463,15 @@ else:
         "\n".join(leaderboard) 
     )
 
+    all_stocks = ["📊 FULL WATCHLIST"]
+
+    for _, detail in daily_details:
+        all_stocks.append(detail)
+
+    sections.append(
+        "\n".join(all_stocks)
+    )
+    
     if strong_buy:
         sections.append(
             "🚨 STRONG BUY\n\n" +

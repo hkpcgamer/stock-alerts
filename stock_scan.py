@@ -109,6 +109,21 @@ def get_news(ticker):
 
 from datetime import datetime, UTC
 
+def trend_state(above50, above200):
+
+    if above50 and above200:
+        return "✅ Strong Uptrend"
+
+    elif (not above50) and above200:
+        return "⚠️ Pullback in Uptrend"
+
+    elif above50 and (not above200):
+        return "🔄 Recovery Attempt"
+
+    else:
+        return "❌ Downtrend"
+
+
 today = datetime.now(UTC).weekday()
 
 strong_buy = []
@@ -210,6 +225,11 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         status50 = "✅" if above50 else "❌"
         status200 = "✅" if above200 else "❌"
+
+        trend = trend_state(
+            above50,
+            above200
+        )
 
         trend = trend_state(
             above50,

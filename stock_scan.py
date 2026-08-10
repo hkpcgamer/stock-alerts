@@ -536,13 +536,17 @@ else:
 
     message = "\n\n".join(sections)
 
-requests.post(
+response = requests.post(
     f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
     json={
         "chat_id": CHAT_ID,
         "text": message
     }
 )
+
+print("Telegram status:", response.status_code)
+print("Telegram response:", response.text)
+
 def trend_state(above50, above200):
     if above50 and above200:
         return "✅ Strong Uptrend"

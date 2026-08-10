@@ -404,6 +404,8 @@ rankings.sort(
     key=lambda x: x[0],
     reverse=True
 )
+print("DEBUG rankings:", len(rankings))
+print("DEBUG daily_details:", len(daily_details))
 
 top5 = rankings[:5]
 

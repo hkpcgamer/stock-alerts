@@ -8,7 +8,6 @@ CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
 
 WATCHLIST = {
-    "1475.T": 40,
     "0087.HK": 40,
     "0293.HK": 40,
     "LAMR": 40,
@@ -25,9 +24,7 @@ WATCHLIST = {
     "PG": 35,
     "MC.PA": 40,
     "META": 45,
-    "PSX": 35,
     "TSLA": 45,
-    "SCHD": 35,
     "VIG": 35,
     "SPCX": 40,
     "SMH": 40,
@@ -37,7 +34,6 @@ WATCHLIST = {
     "ICLN": 40, 
     "IGF": 40, 
     "INDA": 40, 
-    "SLVR": 40, 
     "VGIT": 35, 
     "XLE": 35, 
     "XLU": 35

@@ -10,7 +10,7 @@ FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
 WATCHLIST = {
     "1475.T": 40,
     "0087.HK": 40,
-    "293.HK": 40,
+    "0293.HK": 40,
     "LAMR": 40,
     "MPLX": 35,
     "MU": 45,
@@ -107,7 +107,9 @@ def get_news(ticker):
         return []
 
 
-today = datetime.utcnow().weekday()
+from datetime import datetime, UTC
+
+today = datetime.now(UTC).weekday()
 
 strong_buy = []
 buy = []
@@ -208,6 +210,11 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         status50 = "✅" if above50 else "❌"
         status200 = "✅" if above200 else "❌"
+
+        trend = trend_state(
+            above50,
+            above200
+        )
 
         # Technical Opportunity Score (100)
 
@@ -445,7 +452,7 @@ else:
             f"({item[2]})"
         )
 
-    sdaily_details.sort(
+    daily_details.sort(
     key=lambda x: x[0],
     reverse=True
 )

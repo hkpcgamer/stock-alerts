@@ -30,10 +30,8 @@ WATCHLIST = {
     "SMH": 40,
     "IAU": 40,
     "ARKG": 45, 
-    "IBIT": 40, 
     "ICLN": 40, 
     "IGF": 40, 
-    "INDA": 40, 
     "VGIT": 35, 
     "XLE": 35, 
     "XLU": 35

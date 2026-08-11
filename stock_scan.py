@@ -142,6 +142,15 @@ rankings = []
 events = []
 daily_details = []
 
+spy_data = yf.download(
+    "SPY",
+    period="1y",
+    progress=False,
+    auto_adjust=True
+)
+
+spy_close = spy_data["Close"].squeeze()
+
 for ticker, rsi_limit in WATCHLIST.items():
 
     try:
@@ -164,6 +173,27 @@ for ticker, rsi_limit in WATCHLIST.items():
         ma200 = float(close.rolling(200).mean().iloc[-1])
 
         rsi14 = float(rsi(close).iloc[-1])
+
+        if len(close) >= 252 and len(spy_close) >= 252:
+
+            stock_return = (
+                close.iloc[-1] /
+                close.iloc[-252]
+            )
+
+            spy_return = (
+                spy_close.iloc[-1] /
+                spy_close.iloc[-252]
+            )
+
+            relative_strength = (
+                stock_return /
+                spy_return
+            )
+
+        else:
+
+            relative_strength = 1.0
 
         ma50_yesterday = float(
             close.rolling(50).mean().iloc[-2]
@@ -289,10 +319,18 @@ for ticker, rsi_limit in WATCHLIST.items():
         elif rsi14 > 70:
             score -= 10
 
+        # Relative Strength vs SPY 
+
+        if relative_strength > 1.20:
+            score += 10
+
+        elif relative_strength > 1.00:
+            score += 5
+   
         # Prevent negative scores
-
+        
         score = max(score, 0)
-
+       
         classification = classify(score)
 
         if golden_cross:

@@ -180,33 +180,33 @@ for ticker, rsi_limit in WATCHLIST.items():
             len(spy_close)
         )
 
-# Relative Strength vs SPY
+        # Relative Strength vs SPY
 
-lookback = min(
-    len(close) - 1,
-    len(spy_close) - 1
-)
+        lookback = min(
+            len(close) - 1,
+            len(spy_close) - 1
+        )
 
-if lookback > 0:
+        if lookback > 0:
 
-    stock_return = (
-        close.iloc[-1]
-        / close.iloc[-(lookback + 1)]
-    )
+            stock_return = (
+                close.iloc[-1]
+                / close.iloc[-(lookback + 1)]
+            )
 
-    spy_return = (
-        spy_close.iloc[-1]
-        / spy_close.iloc[-(lookback + 1)]
-    )
+            spy_return = (
+                spy_close.iloc[-1]
+                / spy_close.iloc[-(lookback + 1)]
+            )
 
-    relative_strength = (
-        stock_return
-        / spy_return
-    )
+            relative_strength = (
+                stock_return
+                / spy_return
+            )
 
-else:
+        else:
 
-    relative_strength = 1.0
+            relative_strength = 1.0
 
 
         ma50_yesterday = float(

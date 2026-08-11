@@ -530,42 +530,34 @@ else:
 
     message = "\n\n".join(sections)
 
-        MAX_LEN = 3500 
-        if len(message) <= MAX_LEN: 
-                
-            response = requests.post( 
-         f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                 json={
-                     "chat_id": CHAT_ID,
-                     "text": message
-                  }
-            )
-             print("Telegram status:", response.status_code) 
-             print("Telegram response:", response.text) 
-         else: 
-             part1 = message[:MAX_LEN]
-             part2 = message[MAX_LEN:]
-                
-             response1 = requests.post(
-             
-         f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", 
-                 json={
-                     "chat_id": CHAT_ID, 
-                     "text": part1
-                  }
-            ) 
-                
-             response2 = requests.post(
-             
-         f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                 json={ 
-                    "chat_id": CHAT_ID,
-                     "text": part2 } 
-                  }
-            )
-         
-                print("Telegram status 1:", response1.status_code) 
-                print("Telegram status 2:", response2.status_code)
+# Message 1: Top opportunities + alerts
+
+message1 = "\n\n".join(sections[:4])
+
+response1 = requests.post(
+    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+    json={
+        "chat_id": CHAT_ID,
+        "text": message1
+    }
+)
+
+print("Telegram status 1:", response1.status_code)
+
+# Message 2: Full watchlist
+
+message2 = "\n\n".join(sections[4:])
+
+response2 = requests.post(
+    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+    json={
+        "chat_id": CHAT_ID,
+        "text": message2
+    }
+)
+
+print("Telegram status 2:", response2.status_code)
+
 
 print("Telegram status:", response.status_code)
 print("Telegram response:", response.text)

@@ -110,9 +110,9 @@ def get_news(ticker):
 
             return headlines
 
-        except Exception:
+    except Exception:
 
-            return []
+        return []
 
 from datetime import datetime, UTC
 

@@ -99,6 +99,9 @@ def get_news(ticker):
 
         articles = response.json()
 
+        print("News status:", response.status_code)
+        print("Articles found:", len(articles))
+
         headlines = []
 
         for article in articles[:4]:
@@ -109,9 +112,6 @@ def get_news(ticker):
 
             if headline:
                 headlines.append(headline)
-
-            print("News status:", response.status_code)
-            print("Articles found:", len(articles))
 
             return headlines
 

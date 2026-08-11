@@ -208,7 +208,6 @@ for ticker, rsi_limit in WATCHLIST.items():
 
             relative_strength = 1.0
 
-
         ma50_yesterday = float(
             close.rolling(50).mean().iloc[-2]
         )

@@ -7,6 +7,11 @@ BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
 
+print(
+    "FINNHUB loaded:",
+    bool(FINNHUB_API_KEY)
+)
+
 WATCHLIST = {
     "0087.HK": 40,
     "0293.HK": 40,

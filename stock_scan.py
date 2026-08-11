@@ -105,7 +105,6 @@ def get_news(ticker):
             if headline:
                 headlines.append(headline)
 
-            print("News URL:", url)
             print("News status:", response.status_code)
             print("Articles found:", len(articles))
 
@@ -114,7 +113,6 @@ def get_news(ticker):
         except Exception:
 
             return []
-
 
 from datetime import datetime, UTC
 

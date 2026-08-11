@@ -559,8 +559,8 @@ response2 = requests.post(
 print("Telegram status 2:", response2.status_code)
 
 
-print("Telegram status:", response.status_code)
-print("Telegram response:", response.text)
+print("Telegram status 1:", response1.status_code)
+print("Telegram status 2:", response2.status_code)
 
 def trend_state(above50, above200):
     if above50 and above200:

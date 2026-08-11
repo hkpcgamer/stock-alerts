@@ -109,6 +109,10 @@ def get_news(ticker):
 
         return headlines
 
+    print(url)
+    print(response.status_code)
+    print(response.text[:200])
+
     except Exception:
 
         return []

@@ -362,6 +362,7 @@ for ticker, rsi_limit in WATCHLIST.items():
                 f"Score: {score}/100\n"
                 f"Classification: {classification}\n"
                 f"RSI: {rsi14:.1f}\n"
+                f"RS vs SPY: {relative_strength:.2f}\n"
                 f"50DMA: {status50}\n"
                 f"200DMA: {status200}\n"
                 f"{discount:.0f}% below high\n"

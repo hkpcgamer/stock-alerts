@@ -103,17 +103,15 @@ def get_news(ticker):
             )
 
             if headline:
-                headlines.append(
-                    headline
-                )
+                headlines.append(headline)
 
-        return headlines
+            print("News URL:", url)
+            print("News status:", response.status_code)
+            print("Articles found:", len(articles))
 
-    print(url)
-    print(response.status_code)
-    print(response.text[:200])
+            return headlines
 
-    except Exception:
+            except Exception:
 
         return []
 

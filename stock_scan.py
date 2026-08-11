@@ -174,6 +174,12 @@ for ticker, rsi_limit in WATCHLIST.items():
 
         rsi14 = float(rsi(close).iloc[-1])
 
+        print(
+            ticker,
+            len(close),
+            len(spy_close)
+        )
+
         if len(close) >= 252 and len(spy_close) >= 252:
 
             stock_return = (

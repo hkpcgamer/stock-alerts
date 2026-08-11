@@ -34,8 +34,11 @@ WATCHLIST = {
     "IGF": 40, 
     "VGIT": 35, 
     "XLE": 35, 
+    "IBIT": 45, 
+    "MC": 40, 
+    "0303.HK": 35, 
+    "INDA": 40,
     "XLU": 35
-
 }
 
 
